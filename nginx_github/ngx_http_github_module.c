@@ -7,34 +7,28 @@ typedef struct {
 	ngx_str_t github;
 } ngx_http_github_loc_conf_t;
 
-static ngx_int_t ngx_http_hello_init(ngx_conf_t *cf);
+static ngx_int_t ngx_http_github_init(ngx_conf_t *cf);
 
-static void *ngx_http_hello_create_loc_conf(ngx_conf_t *cf);
+static void *ngx_http_github_create_loc_conf(ngx_conf_t *cf);
 
-static char *ngx_http_hello_string(ngx_conf_t *cf, ngx_command_t *cmd,
-		void *conf);
-static char *ngx_http_hello_counter(ngx_conf_t *cf, ngx_command_t *cmd,
+static char *ngx_http_github_string(ngx_conf_t *cf, ngx_command_t *cmd,
 		void *conf);
 
-static ngx_command_t ngx_http_hello_commands[] = { {
-		ngx_string("hello_string"), NGX_HTTP_LOC_CONF | NGX_CONF_NOARGS
-				| NGX_CONF_TAKE1, ngx_http_hello_string,
-		NGX_HTTP_LOC_CONF_OFFSET, offsetof(ngx_http_hello_loc_conf_t,
-				hello_string), NULL },
+static ngx_command_t ngx_http_github_commands[] = {
+		{
+				ngx_string("github"),
+				NGX_HTTP_LOC_CONF | NGX_CONF_NOARGS | NGX_CONF_TAKE1,
+				ngx_http_github_string,
+				NGX_HTTP_LOC_CONF_OFFSET,
+				offsetof(ngx_http_github_loc_conf_t, github),
+				NULL
+		},
+		ngx_null_command
+};
 
-{ ngx_string("hello_counter"), NGX_HTTP_LOC_CONF | NGX_CONF_FLAG,
-		ngx_http_hello_counter, NGX_HTTP_LOC_CONF_OFFSET, offsetof(
-				ngx_http_hello_loc_conf_t, hello_counter), NULL },
 
-ngx_null_command };
-
-/*
- static u_char ngx_hello_default_string[] = "Default String: Hello, world!";
- */
-static int ngx_hello_visited_times = 0;
-
-static ngx_http_module_t ngx_http_hello_module_ctx = { NULL, /* preconfiguration */
-ngx_http_hello_init, /* postconfiguration */
+static ngx_http_module_t ngx_http_github_module_ctx = {NULL, /* preconfiguration */
+ngx_http_github_init, /* postconfiguration */
 
 NULL, /* create main configuration */
 NULL, /* init main configuration */
@@ -42,13 +36,13 @@ NULL, /* init main configuration */
 NULL, /* create server configuration */
 NULL, /* merge server configuration */
 
-ngx_http_hello_create_loc_conf, /* create location configuration */
+ngx_http_github_create_loc_conf, /* create location configuration */
 NULL /* merge location configuration */
 };
 
-ngx_module_t ngx_http_hello_module = { NGX_MODULE_V1,
-		&ngx_http_hello_module_ctx, /* module context */
-		ngx_http_hello_commands, /* module directives */
+ngx_module_t ngx_http_github_module = { NGX_MODULE_V1,
+		&ngx_http_github_module_ctx, /* module context */
+		ngx_http_github_commands, /* module directives */
 		NGX_HTTP_MODULE, /* module type */
 		NULL, /* init master */
 		NULL, /* init module */
