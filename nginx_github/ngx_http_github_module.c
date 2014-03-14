@@ -75,7 +75,7 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 		return NGX_DECLINED;
 	}
 
-	ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "nginx get args:%V", &r->args);
+	//ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "nginx get args:%V", &r->args);
 
 	ngx_memzero(resp_content, sizeof(resp_content));
 
@@ -85,7 +85,7 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 	}
 
 
-	ngx_str_set(&get_var, "respo");
+	ngx_str_set(&get_var, "id");
 
 	//初始化数组
 	ngx_array_init(get_values, r->pool, 10, sizeof(ngx_str_t));
@@ -94,7 +94,10 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 		return NGX_ERROR;
 	}
 
+	fprintf(stderr, "%d", get_values->nelts);
+
 	value = get_values->elts;
+
 
 	ngx_sprintf(resp_content, "respo:%V\n", value);
 
@@ -144,21 +147,42 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 static ngx_int_t
 ngx_http_get_value(ngx_http_request_t *r, ngx_str_t *get_var, ngx_array_t *get_values)
 {
-	ngx_str_t *v;
-	u_char *last;
+	ngx_str_t *v, arg;
+	u_char *p, *pos, *last;
+
 
 	v = ngx_array_push(get_values);
 	if(v == NULL) {
 		return NGX_ERROR;
 	}
 
-	v->len = r->uri.len;
-	v->data = ngx_palloc(r->pool, v->len);
-	last = ngx_copy(v->data, r->uri.data, r->uri.len);
+	arg.len = get_var->len + 1;
+	arg.data = ngx_palloc(r->pool, arg.len + 1);
+	ngx_memzero(arg.data, sizeof(arg.data));
+
+	pos = ngx_copy(arg.data, get_var->data, get_var->len);
+	last = ngx_copy(pos, "=", strlen("="));
+
+	p = ngx_strlcasestrn(r->args.data, r->args.data + r->args.len - 1, arg.data, arg.len);
+
+	pos = p + arg.len;
+
+	//*(r->args.data + r->args.len - 1) = '\0';
+
+	//fprintf(stderr, "%s", r->args.data);
+
+	last = ngx_strlchr(pos, r->args.data + r->args.len - 1, '&');
+
+	v->data = ngx_palloc(r->pool, last - pos);
+	v->len = last - pos;
+
+	last = ngx_copy(v->data, pos, v->len);
+
+
+	fprintf(stderr, "test%s", "lijianwei");
+
 	return NGX_OK;
 }
-
-
 
 
 static void *
