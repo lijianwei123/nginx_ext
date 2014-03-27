@@ -7,6 +7,11 @@ typedef struct {
 	ngx_flag_t github;
 } ngx_http_github_loc_conf_t;
 
+
+typedef struct {
+	ngx_hash_t *git_down_status;
+} ngx_http_github_ctx_t;
+
 static ngx_int_t ngx_http_github_init(ngx_conf_t *cf);
 
 static void *ngx_http_github_create_loc_conf(ngx_conf_t *cf);
@@ -61,6 +66,14 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 
 	ngx_int_t rc;
 
+	ngx_http_github_ctx_t *ctx;
+	ngx_hash_t *git_down_status;
+
+	ngx_str_t *temp;
+
+	ngx_hash_init_t hash_init;
+
+
 	glcf = ngx_http_get_module_loc_conf(r, ngx_http_github_module);
 
 	if (!glcf->github) {
@@ -88,6 +101,42 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 	fprintf(stderr, "%d", get_values->nelts);
 
 	value = get_values->elts;
+
+	ctx = ngx_http_get_module_ctx(r, ngx_http_github_module);
+	if(ctx == NULL) {
+		//初始化
+		ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_github_ctx_t));
+		if(ctx == NULL) {
+			return NGX_ERROR;
+		}
+
+		hash_init.hash = git_down_status;
+		hash_init.key =	ngx_hash_key_lc;
+		hash_init.max_size = 2048; //1KB
+		hash_init.bucket_size = 64;
+		hash_init.name = "git_down_status";
+		hash_init.pool = r->pool;
+		hash_init.temp_pool = NULL;
+
+		ngx_hash_init(hash_init, ))
+
+
+
+
+
+
+
+
+
+
+		ctx->git_down_status = git_down_status;
+
+		ngx_http_set_ctx(r, ctx, ngx_http_github_module);
+	}
+
+	git_down_status = ctx->git_down_status;
+
+
 
 	ngx_sprintf(resp_content, "respo:%V\n", value);
 
