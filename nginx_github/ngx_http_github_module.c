@@ -9,7 +9,7 @@ typedef struct {
 
 
 typedef struct {
-	ngx_hash_t *git_down_status;
+	ngx_array_t *git_down_status;
 } ngx_http_github_ctx_t;
 
 static ngx_int_t ngx_http_github_init(ngx_conf_t *cf);
@@ -109,23 +109,6 @@ static ngx_int_t ngx_http_github_handler(ngx_http_request_t *r) {
 		if(ctx == NULL) {
 			return NGX_ERROR;
 		}
-
-		hash_init.hash = git_down_status;
-		hash_init.key =	ngx_hash_key_lc;
-		hash_init.max_size = 2048; //1KB
-		hash_init.bucket_size = 64;
-		hash_init.name = "git_down_status";
-		hash_init.pool = r->pool;
-		hash_init.temp_pool = NULL;
-
-		ngx_hash_init(hash_init, ))
-
-
-
-
-
-
-
 
 
 

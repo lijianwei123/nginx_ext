@@ -3,6 +3,7 @@
 	<name>nginx_ext</name>
 	<comment></comment>
 	<projects>
+		<project>tengine</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
