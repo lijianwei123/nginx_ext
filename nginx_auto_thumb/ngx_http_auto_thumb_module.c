@@ -16,6 +16,10 @@ typedef struct {
 } ngx_http_auto_thumb_loc_conf_t;
 
 typedef struct {
+	ngx_int_t is_thumb;
+} ngx_http_auto_thumb_ctx_t;
+
+typedef struct {
 	ngx_uint_t width;
 	ngx_uint_t height;
 } thumb_size_t;
@@ -25,14 +29,16 @@ static ngx_int_t ngx_http_auto_thumb_init(ngx_conf_t *cf);
 static void *ngx_http_auto_thumb_create_loc_conf(ngx_conf_t *cf);
 static char *ngx_http_auto_thumb_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
 
+static ngx_http_output_header_filter_pt ngx_http_next_header_filter;
+static ngx_http_output_body_filter_pt  ngx_http_next_body_filter;
 
 static ngx_int_t ngx_http_auto_thumb_handler(ngx_http_request_t *r);
-static ngx_int_t ngx_http_auto_thumb_header_filter(ngx_http_request_t *r);
+static ngx_int_t ngx_http_auto_thumb_rewrite_handler(ngx_http_request_t *r);
 
 static ngx_command_t ngx_http_auto_thumb_commands[] = {
 	{
 		ngx_string("auto_thumb_enabled"),
-		NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
+		NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_HTTP_LIF_CONF | NGX_HTTP_SIF_CONF | NGX_CONF_TAKE1,
 		ngx_conf_set_flag_slot,
 		NGX_HTTP_LOC_CONF_OFFSET,
 		offsetof(ngx_http_auto_thumb_loc_conf_t, auto_thumb_enabled),
@@ -187,8 +193,9 @@ ngx_http_auto_thumb_handler(ngx_http_request_t *r)
 	}
 
 	ngx_http_auto_thumb_loc_conf_t *auto_thumb_conf =  NULL;
+	char *pos = strrchr((const char *)r->uri, '@');
 	auto_thumb_conf = ngx_http_get_module_loc_conf(r, ngx_http_auto_thumb_module);
-	if (auto_thumb_conf->auto_thumb_enabled == 0) {
+	if (auto_thumb_conf->auto_thumb_enabled == 0 || null == pos) {
 		return NGX_DECLINED;
 	}
 
@@ -196,20 +203,39 @@ ngx_http_auto_thumb_handler(ngx_http_request_t *r)
 	ret = getThumbSizeByUrl(r->uri, thumb_size_ptr);
 
 	if (ret != NGX_OK) {
-		return NGX_ERROR;
+		return NGX_DECLINED;
 	}
 	//调用缩略图生成程序
 
-	//upload server
-
-
-
-
-
-
-
-
 }
+
+static ngx_int_t
+ngx_http_auto_thumb_rewrite_handler(ngx_http_request_t *r)
+{
+	//转到原始图片
+	ngx_http_auto_thumb_loc_conf_t *atlc = ngx_http_get_module_loc_conf(r, ngx_http_auto_thumb_module);
+	u_char *sep = strrchr((const char *)r->uri.data, '@');
+
+	if (atlc->auto_thumb_enabled == 0 || sep == NULL) {
+		return NGX_DECLINED;
+	}
+	r->uri.len = ngx_cpymem(sep, r->exten.data - 1, r->exten.len + 1) - r->uri.data;
+	r->uri_changed = 1;
+}
+
+static ngx_int_t
+ngx_http_auto_thumb_header_filter(ngx_http_request_t *r)
+{
+
+	return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_auto_thumb_body_filter(ngx_http_request_t *r, ngx_chain_t *ch)
+{
+	return NGX_OK;
+}
+
 
 static void *
 ngx_http_auto_thumb_create_loc_conf(ngx_conf_t *cf)
@@ -245,16 +271,38 @@ ngx_http_auto_thumb_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_auto_thumb_init(ngx_conf_t *cf)
 {
-	ngx_http_handler_pt *handler;
+	ngx_http_handler_pt *handler, *server_rewrite_handler, *location_rewrite_handler ;
 	ngx_http_core_main_conf_t *cmcf;
+	ngx_http_auto_thumb_ctx_t *ctx;
+	ngx_http_auto_thumb_loc_conf_t *atlc;
+
 	cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_auto_thumb_module);
 
+	//content handler
 	handler = ngx_array_push(cmcf->phases[NGX_HTTP_CONTENT_PHASE].handlers);
 	if (handler == NULL) {
 		return NGX_ERROR;
 	}
-
 	*handler = ngx_http_auto_thumb_handler;
+
+	//rewrite handler
+	server_rewrite_handler = ngx_array_push(cmcf->phases[NGX_HTTP_SERVER_REWRITE_PHASE].handlers);
+	if (server_rewrite_handler == NULL) {
+		return NGX_ERROR;
+	}
+	location_rewrite_handler = ngx_array_push(cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
+	if (location_rewrite_handler == NULL) {
+		return NGX_ERROR;
+	}
+	server_rewrite_handler = location_rewrite_handler = ngx_http_auto_thumb_rewrite_handler;
+
+	//header footer filter
+	ngx_http_next_header_filter = ngx_http_top_header_filter;
+	ngx_http_top_header_filter = ngx_http_auto_thumb_header_filter;
+
+	ngx_http_next_body_filter = ngx_http_top_body_filter;
+	ngx_http_top_body_filter = ngx_http_auto_thumb_body_filter;
+
 
 	return NGX_OK;
 }
