@@ -42,6 +42,10 @@ make dso_tool
 wget http://luajit.org/download/LuaJIT-2.0.3.tar.gz
 make && make install
 
+./configure --with-http_lua_module=shared
+make
+make dso_install
+
 
 ÐÞ¸Ängx_http_image_filter_module.c
 
