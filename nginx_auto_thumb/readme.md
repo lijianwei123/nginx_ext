@@ -49,8 +49,7 @@ make dso_install
 
 修改ngx_http_image_filter_module.c
 
-
-[^code]
+```C
 //add by lijianwei start
 #define IMAGE_INVOKE_ON  1
 #define IMAGE_INVOKE_OFF 0
@@ -67,7 +66,7 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
     return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
 }
 //add by lijianwei end
-
+```
 
 在ngx_http_image_header_filter  ngx_http_image_body_filter增加
     //add by lijianwei 加个判断
