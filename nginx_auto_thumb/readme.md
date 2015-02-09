@@ -15,8 +15,9 @@ make && make install
 
 
 
-
-##############################如何使用官方的image filter module######################################################
+------
+##如何使用官方的image filter module
+```SHELL
 yum -y install libjpeg-devel  libpng-devel freetype-devel
 
 wget https://github.com/libgd/libgd/archive/gd-2.1.1.tar.gz
@@ -31,23 +32,24 @@ make
 
 make install
 
-在tegine已编译过的文件中
+\#在tegine已编译过的文件中
 ./configure --with-http_image_filter_module=shared --with-cc-opt="-I /usr/local/libgd2.1.1/include" --with-ld-opt="-Wl,-rpath,/usr/local/libgd2.1.1/lib -L /usr/local/libgd2.1.1/lib"
 make
 make dso_tool
 
 这样就安装了ngx_http_image_filter_module模块了
 
-###配置使用中需要使用到lua module
+##配置使用中需要使用到lua module
+```SHELL
 wget http://luajit.org/download/LuaJIT-2.0.3.tar.gz
 make && make install
 
 ./configure --with-http_lua_module=shared
 make
 make dso_install
+```
 
-
-修改ngx_http_image_filter_module.c
+##修改ngx_http_image_filter_module.c
 
 ```C
 //add by lijianwei start
@@ -68,14 +70,15 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
 //add by lijianwei end
 ```
 
-在ngx_http_image_header_filter  ngx_http_image_body_filter增加
-    //add by lijianwei 加个判断
-    rc = ngx_http_image_get_image_invoke(r);
-    if (rc == IMAGE_INVOKE_OFF) {
-    	return ngx_http_next_body_filter(r, in);
-    }
+//在ngx_http_image_header_filter  ngx_http_image_body_filter增加
+```C
+rc = ngx_http_image_get_image_invoke(r);
+if (rc == IMAGE_INVOKE_OFF) {
+    return ngx_http_next_body_filter(r, in);
+}
 
-为了能使squid类的缓存，加上了重写
+//为了能使squid类的缓存，加上了重写
+```NGINX
 if (!-e $request_filename) {
             rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
 }
@@ -83,9 +86,9 @@ if (!-e $request_filename) {
 http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
 重写为
 http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
-
-在nginx配置中增加
-
+```
+//在nginx配置中增加
+```NGINX
                 if ($arg_key) {
                         set $image_filter_invoke 0;
                         rewrite_by_lua '
@@ -108,8 +111,7 @@ http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=
 			memcached_pass 168.192.122.29:11211;
 			default_type     text/plain;
 		}
-
-
+```
 
 
 ############################################################################################################################
