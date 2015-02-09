@@ -1,4 +1,4 @@
-#依赖GraphicsMagick
+##依赖GraphicsMagick
 GraphicsMagick 依赖libjpeg  libpng  freetype
 
 可以从ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates 选择下载
@@ -10,13 +10,11 @@ wget http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.
 ./configure --prefix=/usr/local/GraphicsMagick-1.3.20/ --with-jpeg=yes  --x-libraries=/usr/local/lib
 make && make install
 
-#使用
+##使用
 /usr/local/GraphicsMagick-1.3.20/bin/gm  convert 1.jpg  -resize 200x200 2.jpg 按照比例缩放
 
-
-
 ------
-##如何使用官方的image filter module
+##安装官方的image filter module
 ```SHELL
 yum -y install libjpeg-devel  libpng-devel freetype-devel
 
@@ -32,12 +30,12 @@ make
 
 make install
 
-\#在tegine已编译过的文件中
+#在tegine已编译过的文件中
 ./configure --with-http_image_filter_module=shared --with-cc-opt="-I /usr/local/libgd2.1.1/include" --with-ld-opt="-Wl,-rpath,/usr/local/libgd2.1.1/lib -L /usr/local/libgd2.1.1/lib"
 make
 make dso_tool
 
-这样就安装了ngx_http_image_filter_module模块了
+#这样就安装了ngx_http_image_filter_module模块了
 
 ##配置使用中需要使用到lua module
 ```SHELL
@@ -114,4 +112,3 @@ http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=
 ```
 
 
-############################################################################################################################
