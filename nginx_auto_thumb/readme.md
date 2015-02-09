@@ -38,7 +38,7 @@ make dso_tool
 #这样就安装了ngx_http_image_filter_module模块了
 ```
 
-##配置使用中需要使用到lua module
+##安装lua模块，增强nginx编程能力
 ```SHELL
 wget http://luajit.org/download/LuaJIT-2.0.3.tar.gz
 make && make install
@@ -75,7 +75,7 @@ if (rc == IMAGE_INVOKE_OFF) {
 }
 '''
 
-##为了能使squid类的缓存，加上了重写
+##squid默认不支持带query的url缓存，需要重写url
 ```NGINX
 if (!-e $request_filename) {
             rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
