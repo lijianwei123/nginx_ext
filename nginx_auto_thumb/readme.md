@@ -36,6 +36,7 @@ make
 make dso_tool
 
 #这样就安装了ngx_http_image_filter_module模块了
+```
 
 ##配置使用中需要使用到lua module
 ```SHELL
@@ -66,16 +67,15 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
     return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
 }
 //add by lijianwei end
-```
 
 //在ngx_http_image_header_filter  ngx_http_image_body_filter增加
-```C
 rc = ngx_http_image_get_image_invoke(r);
 if (rc == IMAGE_INVOKE_OFF) {
     return ngx_http_next_body_filter(r, in);
 }
+'''
 
-//为了能使squid类的缓存，加上了重写
+##为了能使squid类的缓存，加上了重写
 ```NGINX
 if (!-e $request_filename) {
             rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
@@ -85,7 +85,7 @@ http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jp
 重写为
 http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
 ```
-//在nginx配置中增加
+##在nginx配置中增加
 ```NGINX
                 if ($arg_key) {
                         set $image_filter_invoke 0;
