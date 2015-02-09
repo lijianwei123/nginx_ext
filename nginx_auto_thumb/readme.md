@@ -50,7 +50,7 @@ make dso_install
 修改ngx_http_image_filter_module.c
 
 
-
+[^code]
 //add by lijianwei start
 #define IMAGE_INVOKE_ON  1
 #define IMAGE_INVOKE_OFF 0
