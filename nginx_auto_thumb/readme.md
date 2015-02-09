@@ -1,7 +1,7 @@
-#ÒÀÀµGraphicsMagick
-GraphicsMagick ÒÀÀµlibjpeg  libpng  freetype
+#ä¾èµ–GraphicsMagick
+GraphicsMagick ä¾èµ–libjpeg  libpng  freetype
 
-¿ÉÒÔ´Óftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates Ñ¡ÔñÏÂÔØ
+å¯ä»¥ä»ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates é€‰æ‹©ä¸‹è½½
 wget ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates/jpegsrc.v9a.tar.gz
 ./configure && make && make install
 
@@ -10,13 +10,13 @@ wget http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.
 ./configure --prefix=/usr/local/GraphicsMagick-1.3.20/ --with-jpeg=yes  --x-libraries=/usr/local/lib
 make && make install
 
-#Ê¹ÓÃ
-/usr/local/GraphicsMagick-1.3.20/bin/gm  convert 1.jpg  -resize 200x200 2.jpg °´ÕÕ±ÈÀıËõ·Å
+#ä½¿ç”¨
+/usr/local/GraphicsMagick-1.3.20/bin/gm  convert 1.jpg  -resize 200x200 2.jpg æŒ‰ç…§æ¯”ä¾‹ç¼©æ”¾
 
 
 
 
-##############################ÈçºÎÊ¹ÓÃ¹Ù·½µÄimage filter module######################################################
+##############################å¦‚ä½•ä½¿ç”¨å®˜æ–¹çš„image filter module######################################################
 yum -y install libjpeg-devel  libpng-devel freetype-devel
 
 wget https://github.com/libgd/libgd/archive/gd-2.1.1.tar.gz
@@ -31,14 +31,14 @@ make
 
 make install
 
-ÔÚtegineÒÑ±àÒë¹ıµÄÎÄ¼şÖĞ
+åœ¨tegineå·²ç¼–è¯‘è¿‡çš„æ–‡ä»¶ä¸­
 ./configure --with-http_image_filter_module=shared --with-cc-opt="-I /usr/local/libgd2.1.1/include" --with-ld-opt="-Wl,-rpath,/usr/local/libgd2.1.1/lib -L /usr/local/libgd2.1.1/lib"
 make
 make dso_tool
 
-ÕâÑù¾Í°²×°ÁËngx_http_image_filter_moduleÄ£¿éÁË
+è¿™æ ·å°±å®‰è£…äº†ngx_http_image_filter_moduleæ¨¡å—äº†
 
-###ÅäÖÃÊ¹ÓÃÖĞĞèÒªÊ¹ÓÃµ½lua module
+###é…ç½®ä½¿ç”¨ä¸­éœ€è¦ä½¿ç”¨åˆ°lua module
 wget http://luajit.org/download/LuaJIT-2.0.3.tar.gz
 make && make install
 
@@ -47,7 +47,7 @@ make
 make dso_install
 
 
-ĞŞ¸Ängx_http_image_filter_module.c
+ä¿®æ”¹ngx_http_image_filter_module.c
 
 
 
@@ -69,15 +69,23 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
 //add by lijianwei end
 
 
-ÔÚngx_http_image_header_filter  ngx_http_image_body_filterÔö¼Ó
-    //add by lijianwei ¼Ó¸öÅĞ¶Ï
+åœ¨ngx_http_image_header_filter  ngx_http_image_body_filterå¢åŠ 
+    //add by lijianwei åŠ ä¸ªåˆ¤æ–­
     rc = ngx_http_image_get_image_invoke(r);
     if (rc == IMAGE_INVOKE_OFF) {
     	return ngx_http_next_body_filter(r, in);
     }
 
+ä¸ºäº†èƒ½ä½¿squidç±»çš„ç¼“å­˜ï¼ŒåŠ ä¸Šäº†é‡å†™
+if (!-e $request_filename) {
+            rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
+}
+ä½¿
+http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
+é‡å†™ä¸º
+http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
 
-ÔÚnginxÅäÖÃÖĞÔö¼Ó
+åœ¨nginxé…ç½®ä¸­å¢åŠ 
 
                 if ($arg_key) {
                         set $image_filter_invoke 0;
@@ -96,7 +104,7 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
                 }
 
 		location = /memc {
-			internal;   #Ö»ÄÜÄÚ²¿·ÃÎÊ
+			internal;   #åªèƒ½å†…éƒ¨è®¿é—®
 			set $memcached_key  $arg_key;
 			memcached_pass 168.192.122.29:11211;
 			default_type     text/plain;
