@@ -1,14 +1,20 @@
-## 依赖GraphicsMagick
+## 安装依赖GraphicsMagick
+
 GraphicsMagick 依赖libjpeg  libpng  freetype
 
 可以从ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates 选择下载
+
+```SHELL
 wget ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates/jpegsrc.v9a.tar.gz
+
 ./configure && make && make install
-
-
+```
+```SHELL
 wget http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.20/GraphicsMagick-1.3.20.tar.gz
+
 ./configure --prefix=/usr/local/GraphicsMagick-1.3.20/ --with-jpeg=yes  --x-libraries=/usr/local/lib
 make && make install
+```
 
 ## 使用
 /usr/local/GraphicsMagick-1.3.20/bin/gm  convert 1.jpg  -resize 200x200 2.jpg 按照比例缩放
