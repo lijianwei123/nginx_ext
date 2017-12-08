@@ -81,14 +81,14 @@ if (rc == IMAGE_INVOKE_OFF) {
 
 
 ## squid默认不支持带query的url缓存，需要重写url
-修改nginx配置
-if (!-e $request_filename) {
-	    rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
-}
-使
-http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
-重写为
-http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
+	修改nginx配置
+	if (!-e $request_filename) {
+		    rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
+	}
+	使
+	http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
+	重写为
+	http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
 
 ## 在nginx配置中增加
 `
