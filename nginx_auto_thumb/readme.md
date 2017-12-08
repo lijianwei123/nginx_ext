@@ -80,7 +80,7 @@ if (rc == IMAGE_INVOKE_OFF) {
 '''
 
 ## squid默认不支持带query的url缓存，需要重写url
-```NGINX
+修改nginx配置
 if (!-e $request_filename) {
             rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
 }
@@ -88,9 +88,9 @@ if (!-e $request_filename) {
 http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
 重写为
 http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
-```
+
 ## 在nginx配置中增加
-```NGINX
+`
                 if ($arg_key) {
                         set $image_filter_invoke 0;
                         rewrite_by_lua '
@@ -113,6 +113,6 @@ http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=
 			memcached_pass 168.192.122.29:11211;
 			default_type     text/plain;
 		}
-```
+`
 
 
