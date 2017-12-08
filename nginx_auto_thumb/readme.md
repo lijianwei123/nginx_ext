@@ -91,29 +91,28 @@ if (rc == IMAGE_INVOKE_OFF) {
 	http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
 
 ## 在nginx配置中增加
-`
-	if ($arg_key) {
-		set $image_filter_invoke 0;
-		rewrite_by_lua '
-			if ngx.var.arg_w == Nil then
-				ngx.exit(500);
-			else
-				local res = ngx.location.capture("/memc", {args = {key = ngx.var.arg_key}});
-				if res.status ~= 200 or res.body == "" or res.body ~= ngx.var.arg_w then
-					ngx.exit(403);
-				end
-			end
-			ngx.var.image_filter_invoke = 1;
-		';
-		image_filter resize $arg_w -;
-	}
 
-	location = /memc {
-		internal;   #只能内部访问
-		set $memcached_key  $arg_key;
-		memcached_pass 168.192.122.29:11211;
-		default_type     text/plain;
-	}
-`
+if ($arg_key) {
+	set $image_filter_invoke 0;
+	rewrite_by_lua \'
+		if ngx.var.arg_w == Nil then
+			ngx.exit(500);
+		else
+			local res = ngx.location.capture("/memc", {args = {key = ngx.var.arg_key}});
+			if res.status ~= 200 or res.body == "" or res.body ~= ngx.var.arg_w then
+				ngx.exit(403);
+			end
+		end
+		ngx.var.image_filter_invoke = 1;
+	\';
+	image_filter resize $arg_w -;
+}
+
+location = /memc {
+	internal;   #只能内部访问
+	set $memcached_key  $arg_key;
+	memcached_pass 168.192.122.29:11211;
+	default_type     text/plain;
+}
 
 
