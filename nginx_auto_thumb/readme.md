@@ -94,7 +94,7 @@ if (rc == IMAGE_INVOKE_OFF) {
 
 if ($arg_key) {
 	set $image_filter_invoke 0;
-	rewrite_by_lua \'
+	rewrite_by_lua '
 		if ngx.var.arg_w == Nil then
 			ngx.exit(500);
 		else
@@ -104,7 +104,7 @@ if ($arg_key) {
 			end
 		end
 		ngx.var.image_filter_invoke = 1;
-	\';
+	';
 	image_filter resize $arg_w -;
 }
 
@@ -114,5 +114,3 @@ location = /memc {
 	memcached_pass 168.192.122.29:11211;
 	default_type     text/plain;
 }
-
-
