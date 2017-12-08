@@ -6,12 +6,10 @@ GraphicsMagick 依赖libjpeg  libpng  freetype
 
 ```SHELL
 wget ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/delegates/jpegsrc.v9a.tar.gz
-
 ./configure && make && make install
 ```
 ```SHELL
 wget http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.20/GraphicsMagick-1.3.20.tar.gz
-
 ./configure --prefix=/usr/local/GraphicsMagick-1.3.20/ --with-jpeg=yes  --x-libraries=/usr/local/lib
 make && make install
 ```
@@ -66,11 +64,11 @@ ngx_http_image_get_image_invoke(ngx_http_request_t *r)
 {
 	ngx_str_t image_invoke_var_name = ngx_string("image_filter_invoke");
 	u_char *data = ngx_palloc(r->pool, image_invoke_var_name.len);
-    ngx_uint_t key = ngx_hash_strlow(data, image_invoke_var_name.data, image_invoke_var_name.len);
+	ngx_uint_t key = ngx_hash_strlow(data, image_invoke_var_name.data, image_invoke_var_name.len);
 
-    ngx_http_variable_value_t  *vv = ngx_http_get_variable(r, &image_invoke_var_name, key);
+	ngx_http_variable_value_t  *vv = ngx_http_get_variable(r, &image_invoke_var_name, key);
 
-    return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
+	return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
 }
 //add by lijianwei end
 
