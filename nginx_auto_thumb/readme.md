@@ -55,64 +55,65 @@ make dso_install
 ## 修改ngx_http_image_filter_module.c
 
 ```C
-//add by lijianwei start
-#define IMAGE_INVOKE_ON  1
-#define IMAGE_INVOKE_OFF 0
+	//add by lijianwei start
+	#define IMAGE_INVOKE_ON  1
+	#define IMAGE_INVOKE_OFF 0
 
-static ngx_int_t
-ngx_http_image_get_image_invoke(ngx_http_request_t *r)
-{
-	ngx_str_t image_invoke_var_name = ngx_string("image_filter_invoke");
-	u_char *data = ngx_palloc(r->pool, image_invoke_var_name.len);
-	ngx_uint_t key = ngx_hash_strlow(data, image_invoke_var_name.data, image_invoke_var_name.len);
+	static ngx_int_t
+	ngx_http_image_get_image_invoke(ngx_http_request_t *r)
+	{
+		ngx_str_t image_invoke_var_name = ngx_string("image_filter_invoke");
+		u_char *data = ngx_palloc(r->pool, image_invoke_var_name.len);
+		ngx_uint_t key = ngx_hash_strlow(data, image_invoke_var_name.data, image_invoke_var_name.len);
 
-	ngx_http_variable_value_t  *vv = ngx_http_get_variable(r, &image_invoke_var_name, key);
+		ngx_http_variable_value_t  *vv = ngx_http_get_variable(r, &image_invoke_var_name, key);
 
-	return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
-}
-//add by lijianwei end
+		return (vv == NULL || vv->not_found) ? IMAGE_INVOKE_OFF :  ngx_atoi(vv->data, vv->len);
+	}
+	//add by lijianwei end
 
-//在ngx_http_image_header_filter  ngx_http_image_body_filter增加
-rc = ngx_http_image_get_image_invoke(r);
-if (rc == IMAGE_INVOKE_OFF) {
-    return ngx_http_next_body_filter(r, in);
-}
-'''
+	//在ngx_http_image_header_filter  ngx_http_image_body_filter增加
+	rc = ngx_http_image_get_image_invoke(r);
+	if (rc == IMAGE_INVOKE_OFF) {
+	    return ngx_http_next_body_filter(r, in);
+	}
+```
+
 
 ## squid默认不支持带query的url缓存，需要重写url
-修改nginx配置
-if (!-e $request_filename) {
-            rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
-}
-使
-http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
-重写为
-http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
+	修改nginx配置
+	if (!-e $request_filename) {
+		    rewrite "^([^!]+)!(\d+)!(\w+)\.(jpg|jpeg|gif|png|bmp)$" $1.$4?key=$3&w=$2 last;
+	}
+	使
+	http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979!640!m_meadin_com.jpg
+	重写为
+	http://f3.v.veimg.cn/meadincms/1/2015/0209/20150209024130979?key=m_meadin_com&w=640
 
 ## 在nginx配置中增加
 `
-                if ($arg_key) {
-                        set $image_filter_invoke 0;
-                        rewrite_by_lua '
-                                if ngx.var.arg_w == Nil then
-                                        ngx.exit(500);
-                                else
-                                        local res = ngx.location.capture("/memc", {args = {key = ngx.var.arg_key}});
-                                        if res.status ~= 200 or res.body == "" or res.body ~= ngx.var.arg_w then
-                                                ngx.exit(403);
-                                        end
-                                end
-                                ngx.var.image_filter_invoke = 1;
-                        ';
-                        image_filter resize $arg_w -;
-                }
+if ($arg_key) {
+	set $image_filter_invoke 0;
+	rewrite_by_lua '
+		if ngx.var.arg_w == Nil then
+			ngx.exit(500);
+		else
+			local res = ngx.location.capture("/memc", {args = {key = ngx.var.arg_key}});
+			if res.status ~= 200 or res.body == "" or res.body ~= ngx.var.arg_w then
+				ngx.exit(403);
+			end
+		end
+		ngx.var.image_filter_invoke = 1;
+	';
+	image_filter resize $arg_w -;
+}
 
-		location = /memc {
-			internal;   #只能内部访问
-			set $memcached_key  $arg_key;
-			memcached_pass 168.192.122.29:11211;
-			default_type     text/plain;
-		}
+location = /memc {
+	internal;   #只能内部访问
+	set $memcached_key  $arg_key;
+	memcached_pass 168.192.122.29:11211;
+	default_type     text/plain;
+}
 `
 
 
